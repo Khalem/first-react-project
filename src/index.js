@@ -3,8 +3,19 @@ import ReactDOM from "react-dom";
 
 import "./styles.css";
 
-function App() {
-  const onTellJoke = () => {
+class App extends React.Component {
+  // Create constructor to add states and bind onTellJoke method
+  constructor() {
+    super();
+
+    this.state = {
+      joke: null
+    };
+    this.onTellJoke = this.onTellJoke.bind(this);
+  }
+
+  // Get joke from API
+  onTellJoke() {
     fetch("https://icanhazdadjoke.com/", {
       method: "GET",
       headers: {
@@ -12,10 +23,22 @@ function App() {
       }
     })
       .then(response => response.json())
-      .then(json => console.log(json));
-  };
+      .then(json => {
+        this.setState({ joke: json.joke });
+      });
+  }
 
-  return <button onClick={onTellJoke}>Tell Me a Joke</button>;
+  // Render the JSX elements
+  render() {
+    console.log("----- RENDER -----");
+
+    return (
+      <div>
+        <button onClick={this.onTellJoke}>Tell Me a Joke</button>
+        <p>{this.state.joke}</p>
+      </div>
+    );
+  }
 }
 
 const rootElement = document.getElementById("root");
