@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import "./styles.css";
 
 class App extends React.Component {
+  // Create constructor to add states and bind onTellJoke method
   constructor() {
     super();
 
@@ -13,6 +14,7 @@ class App extends React.Component {
     this.onTellJoke = this.onTellJoke.bind(this);
   }
 
+  // Get joke from API
   onTellJoke() {
     fetch("https://icanhazdadjoke.com/", {
       method: "GET",
@@ -26,6 +28,7 @@ class App extends React.Component {
       });
   }
 
+  // Render the JSX elements
   render() {
     console.log("----- RENDER -----");
 
