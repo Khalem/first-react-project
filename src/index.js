@@ -9,19 +9,21 @@ class App extends React.Component {
     super();
 
     this.state = {
-      joke: null,
+      searchTerm: "",
+      jokes: [],
       isFetchingJoke: false
     };
     this.onTellJoke = this.onTellJoke.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
   }
 
   componentDidMount() {
-    this.fetchJoke();
+    this.searchJokes();
   }
 
-  fetchJoke() {
+  searchJokes() {
     this.setState({ isFetchingJoke: true });
-    fetch("https://icanhazdadjoke.com/", {
+    fetch("https://icanhazdadjoke.com/search", {
       method: "GET",
       headers: {
         Accept: "application/json"
@@ -29,8 +31,9 @@ class App extends React.Component {
     })
       .then(response => response.json())
       .then(json => {
+        const jokes = json.results;
         this.setState({
-          joke: json.joke,
+          jokes,
           isFetchingJoke: false
         });
       });
@@ -38,17 +41,35 @@ class App extends React.Component {
 
   // Get joke from API
   onTellJoke() {
-    this.fetchJoke();
+    this.searchJokes();
+  }
+
+  onSearchChange(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   // Render the JSX elements
   render() {
-    console.log("----- RENDER -----");
-
     return (
       <div>
-        <button onClick={this.onTellJoke} disabled={this.state.isFetchingJoke}>Tell Me a Joke</button>
-        <p>{this.state.isFetchingJoke ? "Loading Joke" : this.state.joke}</p>
+        <form>
+          <input
+            type="text"
+            placeholder="Enter search term..."
+            onChange={this.onSearchChange}
+          />
+          <button>Search</button>
+
+          <button
+            onClick={this.onTellJoke}
+            disabled={this.state.isFetchingJoke}
+          >
+            Tell Me a Joke
+          </button>
+        </form>
+
+        <p>{this.state.jokes.toString()}</p>
+        <p>Search term: {this.state.searchTerm}</p>
       </div>
     );
   }
