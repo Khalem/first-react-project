@@ -13,19 +13,23 @@ class App extends React.Component {
       jokes: [],
       isFetchingJoke: false
     };
-    this.onTellJoke = this.onTellJoke.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onSearchSubmit = this.onSearchSubmit.bind(this);
   }
 
-  searchJokes() {
+  searchJokes(limit = 20) {
     this.setState({ isFetchingJoke: true });
-    fetch(`https://icanhazdadjoke.com/search?term=${this.state.searchTerm}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json"
+    fetch(
+      `https://icanhazdadjoke.com/search?term=${
+        this.state.searchTerm
+      }&limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json"
+        }
       }
-    })
+    )
       .then(response => response.json())
       .then(json => {
         const jokes = json.results;
@@ -35,11 +39,6 @@ class App extends React.Component {
           isFetchingJoke: false
         });
       });
-  }
-
-  // Get joke from API
-  onTellJoke() {
-    this.searchJokes();
   }
 
   onSearchChange(event) {
@@ -74,10 +73,10 @@ class App extends React.Component {
           <button>Search</button>
 
           <button
-            onClick={this.onTellJoke}
+            onClick={() => this.searchJokes(1)}
             disabled={this.state.isFetchingJoke}
           >
-            Tell Me a Joke
+            I'm Feeling Funny
           </button>
         </form>
 
