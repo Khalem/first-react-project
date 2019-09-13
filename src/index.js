@@ -15,15 +15,12 @@ class App extends React.Component {
     };
     this.onTellJoke = this.onTellJoke.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
-  }
-
-  componentDidMount() {
-    this.searchJokes();
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
   }
 
   searchJokes() {
     this.setState({ isFetchingJoke: true });
-    fetch("https://icanhazdadjoke.com/search", {
+    fetch(`https://icanhazdadjoke.com/search?term=${this.state.searchTerm}`, {
       method: "GET",
       headers: {
         Accept: "application/json"
@@ -32,6 +29,7 @@ class App extends React.Component {
       .then(response => response.json())
       .then(json => {
         const jokes = json.results;
+        console.log("jokes", jokes);
         this.setState({
           jokes,
           isFetchingJoke: false
@@ -48,11 +46,16 @@ class App extends React.Component {
     this.setState({ searchTerm: event.target.value });
   }
 
+  onSearchSubmit(event) {
+    event.preventDefault();
+    this.searchJokes();
+  }
+
   // Render the JSX elements
   render() {
     return (
       <div>
-        <form>
+        <form onSubmit={this.onSearchSubmit}>
           <input
             type="text"
             placeholder="Enter search term..."
