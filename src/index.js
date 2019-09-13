@@ -9,13 +9,18 @@ class App extends React.Component {
     super();
 
     this.state = {
-      joke: null
+      joke: null,
+      isFetchingJoke: false
     };
     this.onTellJoke = this.onTellJoke.bind(this);
   }
 
-  // Get joke from API
-  onTellJoke() {
+  componentDidMount() {
+    this.fetchJoke();
+  }
+
+  fetchJoke() {
+    this.setState({ isFetchingJoke: true });
     fetch("https://icanhazdadjoke.com/", {
       method: "GET",
       headers: {
@@ -24,8 +29,16 @@ class App extends React.Component {
     })
       .then(response => response.json())
       .then(json => {
-        this.setState({ joke: json.joke });
+        this.setState({
+          joke: json.joke,
+          isFetchingJoke: false
+        });
       });
+  }
+
+  // Get joke from API
+  onTellJoke() {
+    this.fetchJoke();
   }
 
   // Render the JSX elements
@@ -34,8 +47,8 @@ class App extends React.Component {
 
     return (
       <div>
-        <button onClick={this.onTellJoke}>Tell Me a Joke</button>
-        <p>{this.state.joke}</p>
+        <button onClick={this.onTellJoke} disabled={this.state.isFetchingJoke}>Tell Me a Joke</button>
+        <p>{this.state.isFetchingJoke ? "Loading Joke" : this.state.joke}</p>
       </div>
     );
   }
