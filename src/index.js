@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import SearchForm from "./SearchForm";
 
 import "./styles.css";
 
@@ -11,14 +12,14 @@ class App extends React.Component {
     this.state = {
       searchTerm: "",
       jokes: [],
-      isFetchingJoke: false
+      isFetchingJokes: false
     };
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onSearchSubmit = this.onSearchSubmit.bind(this);
   }
 
   searchJokes(limit = 20) {
-    this.setState({ isFetchingJoke: true });
+    this.setState({ isFetchingJokes: true });
     fetch(
       `https://icanhazdadjoke.com/search?term=${
         this.state.searchTerm
@@ -36,7 +37,7 @@ class App extends React.Component {
         console.log("jokes", jokes);
         this.setState({
           jokes,
-          isFetchingJoke: false
+          isFetchingJokes: false
         });
       });
   }
@@ -64,23 +65,14 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <form onSubmit={this.onSearchSubmit}>
-          <input
-            type="text"
-            placeholder="Enter search term..."
-            onChange={this.onSearchChange}
-          />
-          <button>Search</button>
+        <SearchForm
+          onFormSubmit={this.onSearchSubmit}
+          onSearchValueChange={this.onSearchChange}
+          isSearching={this.state.isFetchingJokes}
+          onSingleSearchClick={() => this.searchJokes(1)}
+        />
 
-          <button
-            onClick={() => this.searchJokes(1)}
-            disabled={this.state.isFetchingJoke}
-          >
-            I'm Feeling Funny
-          </button>
-        </form>
-
-        {this.state.isFetchingJoke ? "Loading Joke..." : this.renderJokes()}
+        {this.state.isFetchingJokes ? "Loading Joke..." : this.renderJokes()}
 
         <p>Search term: {this.state.searchTerm}</p>
       </div>
