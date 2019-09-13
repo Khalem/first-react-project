@@ -4,8 +4,6 @@ import ReactDOM from "react-dom";
 import "./styles.css";
 
 class App extends React.Component {
-  joke = null;
-
   constructor() {
     super();
 
