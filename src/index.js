@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import SearchForm from "./SearchForm";
+import JokeList from "./JokeList";
 
 import "./styles.css";
 
@@ -12,28 +13,31 @@ class App extends React.Component {
     this.state = {
       searchTerm: "",
       jokes: [],
-      isFetchingJokes: false
+      isFetchingJokes: false,
+      limit: 10
     };
     this.onSearchChange = this.onSearchChange.bind(this);
     this.searchJokes = this.searchJokes.bind(this);
+    this.onClear = this.onClear.bind(this);
+    this.onLimitChange = this.onLimitChange.bind(this);
   }
 
-  searchJokes(limit = 20) {
-    this.setState({ isFetchingJokes: true });
-    fetch(
-      `https://icanhazdadjoke.com/search?term=${
-        this.state.searchTerm
-      }&limit=${limit}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        }
+  searchJokes(value = "", limit = this.state.limit) {
+    this.setState({ isFetchingJokes: true, searchTerm: value });
+    fetch(`https://icanhazdadjoke.com/search?term=${value}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json"
       }
-    )
+    })
       .then(response => response.json())
       .then(json => {
-        const jokes = json.results;
+        var jokes;
+        if (json.results.length < 1) {
+          jokes = [{ id: "empty", joke: "No results found!" }];
+        } else {
+          jokes = json.results;
+        }
         this.setState({
           jokes,
           isFetchingJokes: false
@@ -45,13 +49,39 @@ class App extends React.Component {
     this.setState({ searchTerm: value });
   }
 
+  onClear() {
+    this.setState({
+      searchTerm: "",
+      jokes: []
+    });
+    console.log(this.state.jokes);
+  }
+
+  onLimitChange(value) {
+    console.log(value);
+    this.setState({
+      limit: value
+    });
+  }
+
   renderJokes() {
+    return <JokeList jokes={this.state.jokes} />;
+  }
+
+  renderOptions() {
+    let userLimit = [];
+    for (let i = 0; i <= 20; i++) {
+      userLimit.push(i);
+    }
     return (
-      <ul className="jokes-list">
-        {this.state.jokes.map(item => (
-          <li key={item.id}>{item.joke}</li>
+      <select
+        id="limit"
+        onChange={event => this.onLimitChange(event.target.value)}
+      >
+        {userLimit.map(item => (
+          <option key={item}>{item}</option>
         ))}
-      </ul>
+      </select>
     );
   }
 
@@ -63,11 +93,16 @@ class App extends React.Component {
           <span>Dad Joke</span> Search
         </h1>
 
+        <label for="limit">Result Limit</label>
+        {this.renderOptions()}
+
         <SearchForm
           onFormSubmit={this.searchJokes}
           onSearchValueChange={this.onSearchChange}
           isSearching={this.state.isFetchingJokes}
           onSingleSearchClick={() => this.searchJokes(1)}
+          onClear={this.onClear}
+          searchValue={this.state.searchTerm}
         />
 
         {this.state.isFetchingJokes ? "Loading Joke..." : this.renderJokes()}
