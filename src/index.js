@@ -15,7 +15,7 @@ class App extends React.Component {
       isFetchingJokes: false
     };
     this.onSearchChange = this.onSearchChange.bind(this);
-    this.onSearchSubmit = this.onSearchSubmit.bind(this);
+    this.searchJokes = this.searchJokes.bind(this);
   }
 
   searchJokes(limit = 20) {
@@ -34,7 +34,6 @@ class App extends React.Component {
       .then(response => response.json())
       .then(json => {
         const jokes = json.results;
-        console.log("jokes", jokes);
         this.setState({
           jokes,
           isFetchingJokes: false
@@ -42,18 +41,13 @@ class App extends React.Component {
       });
   }
 
-  onSearchChange(event) {
-    this.setState({ searchTerm: event.target.value });
-  }
-
-  onSearchSubmit(event) {
-    event.preventDefault();
-    this.searchJokes();
+  onSearchChange(value) {
+    this.setState({ searchTerm: value });
   }
 
   renderJokes() {
     return (
-      <ul>
+      <ul className="jokes-list">
         {this.state.jokes.map(item => (
           <li key={item.id}>{item.joke}</li>
         ))}
@@ -64,17 +58,19 @@ class App extends React.Component {
   // Render the JSX elements
   render() {
     return (
-      <div>
+      <div className="App">
+        <h1>
+          <span>Dad Joke</span> Search
+        </h1>
+
         <SearchForm
-          onFormSubmit={this.onSearchSubmit}
+          onFormSubmit={this.searchJokes}
           onSearchValueChange={this.onSearchChange}
           isSearching={this.state.isFetchingJokes}
           onSingleSearchClick={() => this.searchJokes(1)}
         />
 
         {this.state.isFetchingJokes ? "Loading Joke..." : this.renderJokes()}
-
-        <p>Search term: {this.state.searchTerm}</p>
       </div>
     );
   }
